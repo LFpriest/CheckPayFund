@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace作为该mapper.xml文件的唯一标识，即可通过该标识定位此文件 -->
+<mapper namespace="com.youxinjinrong.CHPCMapper">
+    <!-- 通过id值定位预设的sql语句 -->
+    <!-- parameterType输入的参数类型 -->
+    <!-- resultType查询返回的结果类型 -->
+    <!-- Mybatis语法一个语句在形式上只允许有一个输入和输出值，但输入和输出可为集合、数组、对象等 -->
+	<select id="selectCHPC"  parameterType="int" resultType="com.youxinjinrong.CarHalfPayChecklist">
+	select * from car_half_pay_checklist where id = #{id}
+	</select>
+</mapper>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace作为该mapper.xml文件的唯一标识，即可通过该标识定位此文件 -->
+<mapper namespace="com.youxinjinrong.mapper.CHPCMapper">
+	
+	<!-- sql片段 -->
+	<sql id="Objectin">
+		<where>
+			<if test="array != null and array.length>0">
+				<foreach collection="array" open="and id in (" close=")" item="CarHalfPayChecklist" separator=",">
+					${CarHalfPayChecklist.id}
+				</foreach>
+			</if>
+		</where>
+	
+	</sql>
+
+
+
+    <!-- 通过id值定位预设的sql语句 -->
+    <!-- parameterType输入的参数类型 -->
+    <!-- resultType查询返回的结果类型 -->
+    <!-- Mybatis语法一个语句在形式上只允许有一个输入和输出值，但输入和输出可为集合、数组、对象等 -->
+	<select id="selectCHPC"  parameterType="int" resultType="CarHalfPayChecklist">
+	select * from car_half_pay_checklist where id = #{id}
+	</select>
+	
+	<!-- 查询使用了自定义的转换器 
+		1,如果类中的属性和表中的字段类型能够合理识别（例如：String -> varchar），使用resultType,否则（例如：boolean -> integer）使用resultMap;
+		2,如果类中的属性名和表中的字段名能够合理识别（例如：applyid -> applyid），使用resultType,否则（例如：id -> applyid）使用resultMap;
+	
+	-->
+	<select id="selectStatus" parameterType="int" resultMap="booleantointConverter">
+	select * from car_half_pay_checklist where id = #{id}
+	</select>
+	
+	<resultMap type="CarHalfPayChecklist" id="booleantointConverter">
+	
+		<!-- 主键 -->
+		<id property="id" column="id" />
+		<!-- 非主键 -->
+		<result property="pay_id" column="pay_id"/>
+		<result property="applyid" column="applyid"/>
+		<result property="fund_channel" column="fund_channel"/>
+		<result property="total_periods" column="total_periods"/>
+		<result property="current_period" column="current_period"/>
+		<result property="status" column="status" javaType="boolean" jdbcType="INTEGER"/>
+	
+	</resultMap>
+	<!-- 
+		输入参数：parameterType
+		1.类型为 简单类型（8个基本类型+String）
+		#{}、${}的区别:
+		a.
+		#{任意值}
+		${value} ，其中的标识符只能是value
+		
+		b.
+		#{}自动给String类型加上''  （自动类型转换）
+		${} 原样输出，但是适合于 动态排序（动态字段）
+			
+		2.对象类型
+		#{属性名}
+		${属性名}
+	 -->
+	 <!-- 使用resultType+HashMap的方式来指定
+		  select 表的字段名  "类的属性名" from 表 ......，来指定表中字段和类中属性的对应关系；	 
+	  -->
+	  
+	 <select id="selectStatuswithHashMap" parameterType="int" resultType="CarHalfPayChecklist">
+	 	select pay_id,status "status" from car_half_pay_checklist where id = #{id}
+	 </select>
+	 
+	<!-- 动态传参排序 -->
+	<select id="CHPCorderbyColumn" parameterType="String"  resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist order by ${value} desc
+	</select>
+	
+	<!-- 模糊查询 -->
+	<select id="selectCHPClike"  parameterType="CarHalfPayChecklist" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist where current_period > #{current_period} and pay_id like '%${pay_id}%'
+	</select>
+	
+	<!-- 入参为HashMap -->
+	<select id="selectCHPClikeWithHashMap"  parameterType="HashMap" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist where current_period > #{current_period} and pay_id like '%${pay_id}%'
+	</select>
+	
+	<!-- 使用存储过程 查询
+		CREATE PROCEDURE queryCountperiod (IN period INTEGER,OUT scount INTEGER)
+		BEGIN
+		SELECT COUNT(*) INTO scount FROM car_half_pay_checklist WHERE current_period=period;
+		END;
+	-->
+	<!--statementType="CALLABLE"表示sql执行方式是存储过程， 存储过程使用的入参为HashMap类型-->
+	<select id="selectCountperiod" statementType="CALLABLE" parameterType="HashMap">
+			{
+				CALL queryCountperiod(
+				#{period,jdbcType=INTEGER,mode=IN},<!-- 注意这里的逗号 -->
+				#{scount,jdbcType=INTEGER,mode=OUT}
+				)
+			}
+	</select>
+	
+	<!-- 输出为HashMap,用于输出结果字段取别名，别名即为HashMap中key的值 -->
+	<select id="selectBieming" parameterType="int" resultType="HashMap">
+		select applyid "orderid", fund_channel "zifang" from car_half_pay_checklist where id = #{id}
+	</select>
+	
+	<select id="selectBiemingList"  resultType="HashMap">
+		select applyid "orderid", fund_channel "zifang" from car_half_pay_checklist 
+	</select>
+	
+	<!-- 动态SQL -->
+	<select id="selectDongTai" parameterType="CarHalfPayChecklist" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist
+		<where>
+		<!-- <where>标签会自动处理组合起来的sql语句中where后的第一个and，但是不会处理第二个and -->
+			<if test="applyid != null and applyid != 0">
+				and applyid = ${applyid}
+			</if>
+			<if test="fund_channel != null and fund_channel != 0">
+				and fund_channel = ${fund_channel}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 使用<foreach>标签可以迭代数组、对象数组、集合、属性（JiHeClass类：List<Integer> ids） -->
+	<!-- 将多个元素放入对象属性中 -->
+	<select id="selectDongtaiIN" parameterType="JiHeClass" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist
+		<where>
+			<if test="ids != null and ids.size>0">
+				<foreach collection="ids" open="and id in (" close=")" item="id" separator=",">
+					${id}
+				</foreach>
+			</if>
+		</where>
+
+	</select>
+	<!-- 将元素放入数组中（简单数组）
+		注意：在编写代码时，无论传递的是什么参数名，在此xml中必须使用array代替该数组
+	 -->
+	<select id="selectDongtaiWithArray" parameterType="int[]" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist
+		<where>
+			<if test="array != null and array.length>0">
+				<foreach collection="array" open="and id in (" close=")" item="id" separator=",">
+					${id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 将元素放入集合中
+		注意：在编写代码时，无论传递的是什么参数名，在此xml中必须使用list代替该集合
+	 -->	
+	<select id="selectDongtaiWithlsit" parameterType="list" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist
+		<where>
+			<if test="list != null and list.size>0">
+				<foreach collection="list" open="and id in (" close=")" item="id" separator=",">
+					${id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 将元素放入对象数组中
+		注意：在编写代码时，无论传递的是什么参数名，在此xml中parameterType="Object[]"
+	 	
+	<select id="selectDongtaiWithObject" parameterType="Object[]" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist
+		<where>
+			<if test="array != null and array.length>0">
+				<foreach collection="array" open="and id in (" close=")" item="CarHalfPayChecklist" separator=",">
+					${CarHalfPayChecklist.id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	-->
+	<!-- 将元素放入对象数组中
+		注意：在编写代码时，无论传递的是什么参数名，在此xml中parameterType="Object[]"
+	 -->	
+	<select id="selectDongtaiWithObject" parameterType="Object[]" resultType="CarHalfPayChecklist">
+		select * from car_half_pay_checklist
+		<!--
+		sql片段用于将相同的代码提取出来，便于多次引用
+		1，引用sql片段（在文件开始部位）在本文件，refid引用的sql片段的id值；
+		2，引用的sql片段不在本文件，则refid值为namespace值+sql片段id值
+		 -->
+		<!--<include refid="Objectin"></include>  -->
+		<include refid="com.youxinjinrong.abcMapper.Objectin"></include>
+	</select>
+	
+	<!-- 多表查询	 -->
+	<!-- 一对一
+		1，使用业务扩展类：用resultType指定的类的属性，包含多表查询的所有字段；适合量小的多表查询；
+		2，使用resultMap
+	 -->
+	 
+	 <select id="selectdbOO" parameterType="int" resultType="CarHalfPayChecklistbusiness">
+	 	select ck.*,ucr.applyid,ucr.loan_pay from car_half_pay_checklist ck,user_compensatory_summary ucr 
+	 	where ck.applyid = ucr.applyid and ck.id = #{id}
+	 </select>
+	
+</mapper>

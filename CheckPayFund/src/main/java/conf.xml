@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 引入数据库配置文件 -->
+    <properties resource="db.properties" />
+    
+    <!-- 设置别名 -->
+    <typeAliases>
+        <!-- 单个设置别名 -->
+        <!-- <typeAlias type="com.youxinjinrong.CarHalfPayChecklist" alias="CarHalfPayChecklist"/> -->
+        
+        <!-- 批量设置别名，会自动将该包中的所有类 批量定义别名： 别名就是类名 -->
+        <package name="com.youxinjinrong"/>
+    </typeAliases>
+    
+    <!-- 配置自定义转换器 -->
+    <typeHandlers>
+        <typeHandler handler="com.youxinjinrong.converter.BooleanAndIntConverter" javaType="Boolean" jdbcType="INTEGER"/>
+    </typeHandlers>
+    
+   	<!-- 通过environments的default值和environment的id值，来指定运行Mybatis运行时的数据库环境 -->
+	<environments default="development">
+		<environment id="development">
+		    
+		    <!-- 事务的提交方式：
+		    		JDBC:使用JDBC方式提交事务（手工执行commit，rollback，close等操作）
+		    		MANAGED:将事务交由其他组件去托管（例如：Spring，Jboss），默认执行完后会关闭链接；
+		     -->
+			<transactionManager type="JDBC"/>
+			<!--数据源类型：
+					UNPOOLED:使用传统的JDBC模式（每次访问数据库都需要频繁打开关闭数据库连接，比较耗性能）；
+					POOLED:使用数据库连接池模式；
+					JNDI：从Tomcat获取一个内置的数据库连接池；		
+			-->			
+			<dataSource type="POOLED">
+			 <!-- 配置数据库信息 -->
+			<property name="driver" value="${DB_DRIVER_MYSQL}"/>
+			<property name="url" value="${DB_URL_XIN_PAY}"/>
+			<property name="username" value="${DB_USERNAME}"/>
+			<property name="password" value="${DB_PASSWORD}"/>
+			</dataSource>
+		</environment>
+
+	</environments>
+	<mappers>
+	    <!-- 加载映射文件 -->
+		<mapper resource="com/youxinjinrong/mapper/CHPCMapper.xml"/>
+		<mapper resource="com/youxinjinrong/abc.xml"/>
+	</mappers>
+</configuration>
