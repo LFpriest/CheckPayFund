@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace作为该mapper.xml文件的唯一标识，即可通过该标识定位此文件 -->
+<mapper namespace="com.youxinjinrong.mapper.OTOlazyloading">
+	
+	<select id="selectUCR" parameterType="int" resultType="UserCompensatorySummary">
+		select * from user_compensatory_summary where applyid = #{applyid}
+	</select>
+	
+	
+</mapper>

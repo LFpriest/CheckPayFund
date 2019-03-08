@@ -1,5 +1,6 @@
 package com.youxinjinrong;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class JiHeClass {

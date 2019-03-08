@@ -5,6 +5,7 @@
   <version>0.0.1-SNAPSHOT</version>
   
   <dependencies>
+  	<!--mybatis的jar包 -->
 	<dependency>
 		<groupId>org.mybatis</groupId>
 		<artifactId>mybatis</artifactId>
@@ -16,6 +17,37 @@
 		<artifactId>junit</artifactId>
 		<version>4.0</version>
 		<scope>test</scope>
+	</dependency>
+	
+	<!-- 使用log4j依赖的jar包 -->
+	<dependency>
+		<groupId>org.zenframework.z8.dependencies.commons</groupId>
+		<artifactId>log4j-1.2.17</artifactId>
+		<version>2.0</version>
+	</dependency>
+	
+	<!-- 使用Ehcache缓存需要的依赖jar包 -->
+	<dependency>
+		<groupId>com.hynnet</groupId>
+		<artifactId>ehcache-core</artifactId>
+		<version>2.10.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.mybatis.caches</groupId>
+	    <artifactId>mybatis-ehcache</artifactId>
+	    <version>1.1.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-api</artifactId>
+	    <version>1.7.26</version>
+	</dependency>
+	
+	<!-- 使用逆向工程依赖的jar包 -->
+	<dependency>
+		<groupId>org.mybatis.generator</groupId>
+		<artifactId>mybatis-generator-core</artifactId>
+		<version>1.3.7</version>
 	</dependency>
 	  
   </dependencies>

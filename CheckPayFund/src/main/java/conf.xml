@@ -6,6 +6,28 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
     <!-- 引入数据库配置文件 -->
     <properties resource="db.properties" />
     
+    <settings>
+        <!-- 开启日志，并指定使用的具体日志；
+        	如果不指定，Mybatis就会根据以下顺序 寻找日志
+			SLF4J →Apache Commons Logging →Log4j 2 → Log4j →JDK logging
+         -->
+        <setting name="logImpl" value="LOG4J"/>
+        
+        <!-- 开启延迟加载 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 关闭立即加载 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        
+        <!-- lazyLoadTriggerMethods：指定哪个对象的方法触发一次延迟加载。默认值：equals,clone,hashCode,toString
+			    所以，打印对象时，由于触发了 toString 方法，就触发了一次懒加载 -->
+        <setting name="lazyLoadTriggerMethods" value=""/>
+        
+        <!-- 开启二级缓存 -->
+        <setting name="cacheEnabled" value="true"/>
+
+        
+    </settings>
+    
     <!-- 设置别名 -->
     <typeAliases>
         <!-- 单个设置别名 -->
@@ -48,5 +70,6 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	    <!-- 加载映射文件 -->
 		<mapper resource="com/youxinjinrong/mapper/CHPCMapper.xml"/>
 		<mapper resource="com/youxinjinrong/abc.xml"/>
+		<mapper resource="com/youxinjinrong/mapper/OTOlazyloading.xml"/>
 	</mappers>
 </configuration>

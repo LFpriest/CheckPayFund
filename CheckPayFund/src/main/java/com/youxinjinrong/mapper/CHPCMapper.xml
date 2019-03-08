@@ -5,6 +5,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace作为该mapper.xml文件的唯一标识，即可通过该标识定位此文件 -->
 <mapper namespace="com.youxinjinrong.mapper.CHPCMapper">
+
+	<!-- 声明此namespace开启mybatis自带的二级缓存 
+	<cache></cache>
+	-->
+	<!-- 声明使用Ehcache二级缓存 -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache">
+		<!-- 自定义Ehcache.xml中的配置，此配置会覆盖Ehcache.xml中对应的配置 -->
+		<property name="maxElementsInMemory" value="2000"/>
+	</cache>
 	
 	<!-- sql片段 -->
 	<sql id="Objectin">
@@ -201,11 +210,72 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 一对一
 		1，使用业务扩展类：用resultType指定的类的属性，包含多表查询的所有字段；适合量小的多表查询；
 		2，使用resultMap
+			i,通过属性成员，将两个类建立起联系
 	 -->
-	 
+	 <!-- 业务扩展类 -->
 	 <select id="selectdbOO" parameterType="int" resultType="CarHalfPayChecklistbusiness">
 	 	select ck.*,ucr.applyid,ucr.loan_pay from car_half_pay_checklist ck,user_compensatory_summary ucr 
 	 	where ck.applyid = ucr.applyid and ck.id = #{id}
 	 </select>
+	 
+	 <!-- 使用resultMap -->
+	 <select id="selectdbOOMap" parameterType="int" resultMap="OTOmap">
+	 	select ck.*,ucr.applyid,ucr.loan_pay from car_half_pay_checklist ck,user_compensatory_summary ucr 
+	 	where ck.applyid = ucr.applyid and ck.id = #{id}
+	 </select>
+	 <resultMap type="CarHalfPayChecklist" id="OTOmap">
+ 		<id property="id" column="id"/>
+ 		<result property="pay_id" column="pay_id"/>
+ 		<result property="applyid" column="applyid"/>
+ 		<result property="fund_channel" column="fund_channel"/>
+ 		<result property="total_periods" column="total_periods"/>
+ 		<result property="current_period" column="current_period"/>
+ 		<result property="status" column="status" javaType="boolean" jdbcType="INTEGER"/>
+ 		<!--一对一查询时,对象成员映射使用association，javaType指定该属性的类型  -->
+ 		<association property="summary" javaType="UserCompensatorySummary">
+ 			<result property="applyid" column="applyid"/>
+ 			<result property="loan_pay" column="loan_pay"/>
+ 		</association>
+	 </resultMap>
+	 
+	 <!-- 一对一，使用resultMap，延迟加载 -->
+	 <!-- useCache控制是否使用二级缓存 -->
+	 <!-- flushCache="true"强制清除一级缓存和二级缓存 -->
+	 <select id="selectdbOOMapLazyloading"  resultMap="OTOmapLazyloading" flushCache="true" useCache="true" >
+	 	select * from car_half_pay_checklist 
+	 </select>
+	 <resultMap type="CarHalfPayChecklist" id="OTOmapLazyloading">
+ 		<id property="id" column="id"/>
+ 		<result property="pay_id" column="pay_id"/>
+ 		<result property="applyid" column="applyid"/>
+ 		<result property="fund_channel" column="fund_channel"/>
+ 		<result property="total_periods" column="total_periods"/>
+ 		<result property="current_period" column="current_period"/>
+ 		<result property="status" column="status" javaType="boolean" jdbcType="INTEGER"/>
+ 		<!--一对一查询时,对象成员映射使用association，javaType指定该属性的类型  -->
+ 		<association property="summary" javaType="UserCompensatorySummary" select="com.youxinjinrong.mapper.OTOlazyloading.selectUCR" column="applyid">
+ 		<!--
+ 		 	<result property="applyid" column="applyid"/>
+ 			<result property="loan_pay" column="loan_pay"/> 
+ 		 -->
+ 		</association>
+	 </resultMap>
+	 
+	 <!-- 一对多 -->
+	 <select id="selectOTMMap" parameterType="int" resultMap="OTMmap" >
+	 	select ucr.applyid,ucr.loan_pay,chp.id,chp.refund_status from user_compensatory_summary ucr,car_half_pay chp 
+	 	where ucr.applyid = chp.applyid and ucr.applyid = #{applyid}
+	 </select>
+	 <resultMap type="UserCompensatorySummary" id="OTMmap">
+	 	 	<result property="applyid" column="applyid"/>
+ 			<result property="loan_pay" column="loan_pay"/>
+ 			<!-- 一对多，使用 collection，属性的元素类型使用：ofType-->
+ 			<collection property="paylists" ofType="CarHalfPay">
+ 				<result property="applyid" column="applyid"/>
+ 				<result property="pay_id" column="id" javaType="int" jdbcType="INTEGER"/>
+ 				<result property="refund_status" column="refund_status"/>
+ 			</collection>
+	 </resultMap>
+	 
 	
 </mapper>

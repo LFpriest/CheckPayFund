@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -14,7 +15,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import com.youxinjinrong.mapper.CHPCMapper;
 
-public class CarHalfPayChecklist {
+public class CarHalfPayChecklist implements Serializable {
 	
 	private int id;
 	private int pay_id;
@@ -24,6 +25,10 @@ public class CarHalfPayChecklist {
 	private int current_period;
 	private boolean status;
 	
+	//通过该属性建立一对一联系；
+	private UserCompensatorySummary summary;
+	
+
 
 	public CarHalfPayChecklist() {
 
@@ -86,10 +91,20 @@ public class CarHalfPayChecklist {
 	public void setStatus(boolean status) {
 		this.status = status;
 	}
-
 	
+	public UserCompensatorySummary getSummary() {
+		return summary;
+	}
+
+
+	public void setSummary(UserCompensatorySummary summary) {
+		this.summary = summary;
+	}
+
+
+	//用于一对一查询；+"+"+this.summary.getApplyid()+"+"+this.summary.getLoan_pay()
 	public String toString(){
-		return this.getPay_id()+"+"+this.getStatus();
+		return this.pay_id+"+"+this.status;
 	}
 	
 	

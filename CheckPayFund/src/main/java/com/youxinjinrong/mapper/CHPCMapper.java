@@ -9,6 +9,7 @@ import java.util.IllegalFormatCodePointException;
 import com.youxinjinrong.CarHalfPayChecklist;
 import com.youxinjinrong.CarHalfPayChecklistbusiness;
 import com.youxinjinrong.JiHeClass;
+import com.youxinjinrong.UserCompensatorySummary;
 
 /**
  * 1，操作 Mybatis的接口；
@@ -55,4 +56,10 @@ public interface CHPCMapper {
 	List<CarHalfPayChecklist> selectDongtaiWithObject(CarHalfPayChecklist[] ckids);
 	
 	CarHalfPayChecklistbusiness selectdbOO(int id);
+	
+	CarHalfPayChecklist selectdbOOMap(int id);
+	
+	UserCompensatorySummary selectOTMMap(int applyid);
+	
+	List<CarHalfPayChecklist> selectdbOOMapLazyloading();
 }

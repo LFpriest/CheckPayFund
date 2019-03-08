@@ -1,6 +1,8 @@
 package com.youxinjinrong;
 
-public class CarHalfPayChecklistbusiness extends CarHalfPayChecklist {
+import java.io.Serializable;
+
+public class CarHalfPayChecklistbusiness extends CarHalfPayChecklist  {
 	private int applyid;
 	private int loan_pay;
 	public int getApplyid() {

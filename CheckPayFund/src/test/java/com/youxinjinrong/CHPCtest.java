@@ -25,7 +25,7 @@ public class CHPCtest {
 		//加载配置文件中的各项数据库配置，并建立数据库连接
 		SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(reader);
 		SqlSession  session = sessionFactory.openSession();
-		
+		//获取动态代理对象
 		CHPCMapper chpcMapper = session.getMapper(CHPCMapper.class);
 		//使用自定义类型转换器查询；
 //		CarHalfPayChecklist sqltest = chpcMapper.selectStatus(2);
@@ -134,12 +134,73 @@ public class CHPCtest {
 		/**
 		 * 多表查询
 		 * */
+		//使用业务扩展类一对一查询
+//		CarHalfPayChecklistbusiness checklistbusiness = chpcMapper.selectdbOO(1);
+//		System.out.println(checklistbusiness);
+		//使用resultMap一对一查询
+//		CarHalfPayChecklist checklist = chpcMapper.selectdbOOMap(1);
+//		System.out.println(checklist);
 		
-		CarHalfPayChecklistbusiness checklistbusiness = chpcMapper.selectdbOO(1);
-		System.out.println(checklistbusiness);
+		//使用resultMap一对多查询；
+//		UserCompensatorySummary summary = chpcMapper.selectOTMMap(1590223560);
+//		System.out.println(summary);
+//		List<CarHalfPay> pays = summary.getPaylists();
+//		System.out.println(pays);
+//		
+//		for(CarHalfPay pay:pays){
+//			System.out.println(pay);
+//		}
+		
+		//一对一查询使用延迟加载
+//		List<CarHalfPayChecklist> checklists = chpcMapper.selectdbOOMapLazyloading();
+//		
+//		for(CarHalfPayChecklist checklist : checklists){
+//			System.out.println(checklist);
+//			UserCompensatorySummary summary = checklist.getSummary();
+//			if (summary != null) {
+//				System.out.println(summary);
+//			}else {
+//				continue;
+//			}
+//		}
 		
 		
+		/**
+		 * 实验一级缓存，mybatis默认开启一级缓存；如果用同样的SqlSession对象查询相同的数据，
+		 * 则只会在第一次 查询时 向数据库发送SQL语句，并将查询的结果 放入到SQLSESSION中（作为缓存在）；
+		 * 后续再次查询该同样的对象时，则直接从缓存中查询该对象即可（即省略了数据库的访问）；
+		 * */
+//		List<CarHalfPayChecklist> checklists = chpcMapper.selectdbOOMapLazyloading();
+//		System.out.println(checklists);
+//		
+//		//commit()会清楚缓存中的数据,如果再查，需要再次查询数据库；
+//		session.commit();
+//		
+//		List<CarHalfPayChecklist> checklists2 = chpcMapper.selectdbOOMapLazyloading();
+//		System.out.println(checklists2);
 		session.close();
+		
+		/**
+		 * 实验二级缓存
+		 * 
+		 * */
+		SqlSession session1 = sessionFactory.openSession();
+		CHPCMapper chpcMapper1 = session1.getMapper(CHPCMapper.class);
+		List<CarHalfPayChecklist> checklists1 = chpcMapper1.selectdbOOMapLazyloading();
+		System.out.println(checklists1);
+
+		session1.close();//触发将对象写入二级缓存的时机：SqlSession对象的close()方法。
+		
+		SqlSession session2 = sessionFactory.openSession();
+		CHPCMapper chpcMapper2 = session2.getMapper(CHPCMapper.class);
+		List<CarHalfPayChecklist> checklists2 = chpcMapper2.selectdbOOMapLazyloading();
+		System.out.println(checklists2);
+		session2.close();
+		
+
+		
+		
+		
 		
 	}
 	
